@@ -1,0 +1,56 @@
+from collections import deque
+
+class Stack:
+    def __init__(self):
+        self.items = []
+
+    def dorong(self, item):
+        self.items.append(item)
+
+    def tarik(self):
+        return self.items.pop() if self.items else None
+
+class Antrian:
+    def __init__(self):
+        self.items = deque()
+
+    def tambah(self, item):
+        self.items.append(item)
+
+    def layani(self):
+        return self.items.popleft() if self.items else None
+
+class UndoRedo:
+    def __init__(self):
+        self.stack_undo = Stack()
+        self.stack_redo = Stack()
+
+    def lakukan_aksi(self, aksi):
+        self.stack_undo.dorong(aksi)
+        self.stack_redo = Stack()  # Kosongkan stack redo
+
+    def undo(self):
+        aksi = self.stack_undo.tarik()
+        if aksi: self.stack_redo.dorong(aksi)
+        return f"Undo: {aksi}" if aksi else "Tidak ada aksi untuk di-undo"
+
+    def redo(self):
+        aksi = self.stack_redo.tarik()
+        if aksi: self.stack_undo.dorong(aksi)
+        return f"Redo: {aksi}" if aksi else "Tidak ada aksi untuk di-redo"
+
+# Contoh penggunaan
+if __name__ == "__main__":
+    ur = UndoRedo()
+    ur.lakukan_aksi("Edit Dokumen")
+    ur.lakukan_aksi("Simpan Dokumen")
+    print(ur.undo())  # Undo: Simpan Dokumen
+    print(ur.redo())  # Redo: Simpan Dokumen
+
+    antrian = Antrian()
+    antrian.tambah("Pelanggan 1")
+    antrian.tambah("Pelanggan 2")
+    print(f"Antrean: {[p for p in antrian.items]}")  # Antrean: ['Pelanggan 1', 'Pelanggan 2']
+    print(f"Melayani: {antrian.layani()}")  # Melayani: Pelanggan 1
+    antrian.tambah("Pelanggan 3")
+    print(f"Antrean setelah melayani: {[p for p in antrian.items]}")  # Antrean setelah melayani: ['Pelanggan 2', 'Pelanggan 3']
